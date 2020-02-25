@@ -1,7 +1,12 @@
 <template>
   <div class="text-white mb-8">
     <div class="places-input text-gray-800">
-      <input type="text" name class="w-full" />
+      <input type="search" id="address" class="form-control" placeholder="Choose a city..." />
+
+      <p>
+        Selected:
+        <strong id="address-value">none</strong>
+      </p>
     </div>
     <div
       class="weather-container font-sans md:w-128 max-w-lg rounded-lg overflow-hidden bg-gray-900 shadow-lg mt-8"
@@ -64,9 +69,9 @@ export default {
       },
       daily: [],
       location: {
-        name: "Toronto, Canada",
-        lat: 43.6532,
-        lng: -79.38323
+        name: "Maadi, Cairo Governorate",
+        lat: 29.9603106,
+        lng: 31.2356685
       }
     };
   },
@@ -125,8 +130,35 @@ export default {
       return days[newDate.getDay()];
     }
   },
+  watch: {
+    location: {
+      handler(newValue, oldValue) {
+        this.fetchData();
+      },
+      deep: true
+    }
+  },
   mounted() {
     this.fetchData();
+
+    var placesAutocomplete = places({
+      appId: "plY2S12M405O",
+      apiKey: "cc01da321a16f38cb8e6b644d40e7566",
+      container: document.querySelector("#address")
+    }).configure({
+      type: "city",
+      aroundLatLngViaIP: false
+    });
+    var $address = document.querySelector("#address-value");
+    placesAutocomplete.on("change", e => {
+      $address.textContent = e.suggestion.value;
+      this.location.name = `${e.suggestion.name}, ${e.suggestion.country}`;
+      this.location.lat = e.suggestion.latlng.lat;
+      this.location.lng = e.suggestion.latlng.lng;
+    });
+    placesAutocomplete.on("clear", function() {
+      $address.textContent = "none";
+    });
   },
   computed: {
     dailyFiveDays() {

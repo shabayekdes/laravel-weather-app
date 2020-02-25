@@ -1962,6 +1962,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1973,9 +1978,9 @@ __webpack_require__.r(__webpack_exports__);
       },
       daily: [],
       location: {
-        name: "Toronto, Canada",
-        lat: 43.6532,
-        lng: -79.38323
+        name: "Maadi, Cairo Governorate",
+        lat: 29.9603106,
+        lng: 31.2356685
       }
     };
   },
@@ -2017,8 +2022,36 @@ __webpack_require__.r(__webpack_exports__);
       return days[newDate.getDay()];
     }
   },
+  watch: {
+    location: {
+      handler: function handler(newValue, oldValue) {
+        this.fetchData();
+      },
+      deep: true
+    }
+  },
   mounted: function mounted() {
+    var _this2 = this;
+
     this.fetchData();
+    var placesAutocomplete = places({
+      appId: "plY2S12M405O",
+      apiKey: "cc01da321a16f38cb8e6b644d40e7566",
+      container: document.querySelector("#address")
+    }).configure({
+      type: "city",
+      aroundLatLngViaIP: false
+    });
+    var $address = document.querySelector("#address-value");
+    placesAutocomplete.on("change", function (e) {
+      $address.textContent = e.suggestion.value;
+      _this2.location.name = "".concat(e.suggestion.name, ", ").concat(e.suggestion.country);
+      _this2.location.lat = e.suggestion.latlng.lat;
+      _this2.location.lng = e.suggestion.latlng.lng;
+    });
+    placesAutocomplete.on("clear", function () {
+      $address.textContent = "none";
+    });
   },
   computed: {
     dailyFiveDays: function dailyFiveDays() {
@@ -37509,7 +37542,19 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "places-input text-gray-800" }, [
-      _c("input", { staticClass: "w-full", attrs: { type: "text", name: "" } })
+      _c("input", {
+        staticClass: "form-control",
+        attrs: {
+          type: "search",
+          id: "address",
+          placeholder: "Choose a city..."
+        }
+      }),
+      _vm._v(" "),
+      _c("p", [
+        _vm._v("\n      Selected:\n      "),
+        _c("strong", { attrs: { id: "address-value" } }, [_vm._v("none")])
+      ])
     ])
   }
 ]
